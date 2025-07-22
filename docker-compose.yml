@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-spring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - mariadb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/invest
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  mariadb:
+    image: mariadb:11.3
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: invest
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:
