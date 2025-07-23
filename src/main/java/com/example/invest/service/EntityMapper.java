@@ -1,6 +1,10 @@
 package com.example.invest.service;
 
+import com.example.invest.dto.BTCDTO;
 import com.example.invest.dto.CoinDTO;
+import com.example.invest.dto.ETHDTO;
+import com.example.invest.entity.BTC;
+import com.example.invest.entity.ETH;
 import com.example.invest.entity.MINITE;
 import lombok.Data;
 
@@ -33,6 +37,55 @@ public class EntityMapper {
                 .candle_acc_trade_volume(entity.getCandle_acc_trade_volume())
                 .candle_date_time_kst(entity.getCandle_date_time_kst().toString())
                 .candle_date_time_utc(entity.getCandle_date_time_utc().toString())
+                .build();
+    }
+
+    public static BTCDTO entityToDto(BTC entity) {
+        return BTCDTO.builder()
+                .highPrice(entity.getHighPrice())
+                .lowPrice(entity.getLowPrice())
+                .tradePrice(entity.getTradePrice())
+                .openingPrice(entity.getOpeningPrice())
+                .candleAccTradeVolume(entity.getCandleAccTradeVolume())
+                .candleDateTimeKst(entity.getCandleDateTimeKst().toString())
+                .candleDateTimeUtc(entity.getCandleDateTimeUtc().toString())
+                .build();
+    }
+
+    public static BTC dtoToEntity(BTCDTO dto) {
+        return BTC.builder()
+                .highPrice(dto.getHighPrice())
+                .lowPrice(dto.getLowPrice())
+                .tradePrice(dto.getTradePrice())
+                .openingPrice(dto.getOpeningPrice())
+                .candleAccTradeVolume(dto.getCandleAccTradeVolume())
+                .candleDateTimeKst(LocalDateTime.parse(dto.getCandleDateTimeKst(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .candleDateTimeUtc(LocalDateTime.parse(dto.getCandleDateTimeUtc(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .build();
+    }
+
+
+    public static ETHDTO entityToDto(ETH entity) {
+        return ETHDTO.builder()
+                .highPrice(entity.getHighPrice())
+                .lowPrice(entity.getLowPrice())
+                .tradePrice(entity.getTradePrice())
+                .openingPrice(entity.getOpeningPrice())
+                .candleAccTradeVolume(entity.getCandleAccTradeVolume())
+                .candleDateTimeKst(entity.getCandleDateTimeKst().toString())
+                .candleDateTimeUtc(entity.getCandleDateTimeUtc().toString())
+                .build();
+    }
+
+    public static ETH dtoToEntity(ETHDTO dto) {
+        return ETH.builder()
+                .highPrice(dto.getHighPrice())
+                .lowPrice(dto.getLowPrice())
+                .tradePrice(dto.getTradePrice())
+                .openingPrice(dto.getOpeningPrice())
+                .candleAccTradeVolume(dto.getCandleAccTradeVolume())
+                .candleDateTimeKst(LocalDateTime.parse(dto.getCandleDateTimeKst(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .candleDateTimeUtc(LocalDateTime.parse(dto.getCandleDateTimeUtc(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();
     }
 }

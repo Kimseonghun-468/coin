@@ -14,7 +14,4 @@ public class CoinDTO {
     private double candle_acc_trade_volume;
     private String candle_date_time_utc;
     private String candle_date_time_kst;
-
-
-
 }

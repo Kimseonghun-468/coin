@@ -1,7 +1,9 @@
 package com.example.invest.controller;
 
 
+import com.example.invest.dto.BTCDTO;
 import com.example.invest.dto.CoinDTO;
+import com.example.invest.dto.ETHDTO;
 import com.example.invest.repository.CandleRepository;
 import com.example.invest.request.CandleRequest;
 import com.example.invest.service.CoinService;
@@ -27,4 +29,19 @@ public class investApiController {
         List<CoinDTO> result = coinService.selectCoinCandle();
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/selectBTCCandle")
+    @CrossOrigin(origins = "http://192.168.0.117:5137")
+    public ResponseEntity selectBTCCandle(@RequestBody CandleRequest candleRequest) {
+        List<BTCDTO> result = coinService.selectBTCCandle();
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/selectETHCandle")
+    @CrossOrigin(origins = "http://192.168.0.117:5137")
+    public ResponseEntity selectETHCandle(@RequestBody CandleRequest candleRequest) {
+        List<ETHDTO> result = coinService.selectETHCandle();
+        return ResponseEntity.ok(result);
+    }
+
 }
