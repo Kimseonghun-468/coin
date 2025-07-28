@@ -46,7 +46,7 @@ public class CoinService {
         .create();
     private final OkHttpClient client = new OkHttpClient();
     @Scheduled(fixedRate = 1000)
-    public void updateCoinPrices() throws IOException {
+    public void updateBTCPrices() throws IOException {
         Request request = new Request.Builder()
           .url("https://api.bithumb.com/v1/ticker?markets=KRW-BTC")
           .get()
@@ -56,7 +56,6 @@ public class CoinService {
         Type coinListType = new TypeToken<List<CoinDTO>>(){}.getType();
         List<CoinDTO> data = gson.fromJson(response.body().string(), coinListType);
         messagingTemplate.convertAndSend("/topic/BTC", data.get(0).getTrade_price());
-        log.info(data);
     }
 
     @Scheduled(fixedRate = 1000)
@@ -70,7 +69,33 @@ public class CoinService {
         Type coinListType = new TypeToken<List<CoinDTO>>(){}.getType();
         List<CoinDTO> data = gson.fromJson(response.body().string(), coinListType);
         messagingTemplate.convertAndSend("/topic/XRP", data.get(0).getTrade_price());
-        log.info(data);
+    }
+
+    @Scheduled(fixedRate = 1000)
+    public void updateETHPrices() throws IOException {
+        Request request = new Request.Builder()
+          .url("https://api.bithumb.com/v1/ticker?markets=KRW-ETH")
+          .get()
+          .addHeader("accept", "application/json")
+          .build();
+        Response response = client.newCall(request).execute();
+        Type coinListType = new TypeToken<List<CoinDTO>>(){}.getType();
+        List<CoinDTO> data = gson.fromJson(response.body().string(), coinListType);
+        messagingTemplate.convertAndSend("/topic/ETH", data.get(0).getTrade_price());
+    }
+
+    @Scheduled(fixedRate = 1000)
+    public void updateCoinPrices() throws IOException {
+        Request request = new Request.Builder()
+          .url("https://api.upbit.com/v1/ticker?markets=KRW-BTC,KRW-ETH,KRW-XRP")
+          .get()
+          .addHeader("accept", "application/json")
+          .build();
+        Response response = client.newCall(request).execute();
+        Type coinListType = new TypeToken<List<CoinDTO>>(){}.getType();
+        List<CoinDTO> data = gson.fromJson(response.body().string(), coinListType);
+        System.out.println(data);
+        messagingTemplate.convertAndSend("/topic/AllCoin", data);
     }
 
 
@@ -86,7 +111,6 @@ public class CoinService {
         Type coinListType = new TypeToken<List<CoinDTO>>(){}.getType();
         List<CoinDTO> data = gson.fromJson(response.body().string(), coinListType);
         messagingTemplate.convertAndSend("/topic/Chart/XRP", data.get(0));
-        System.out.println(data.get(1));
         MINITE entity = EntityMapper.dtoToEntity(data.get(1));
         try{
             candleRepository.save(entity);
@@ -99,7 +123,7 @@ public class CoinService {
     @Scheduled(fixedRate = 1000)
     public void updateBTCCandle() throws IOException {
         Request request = new Request.Builder()
-          .url("https://api.bithumb.com/v1/candles/minutes/1?market=KRW-BTC&count=2")
+          .url("https://api.upbit.com/v1/candles/minutes/1?market=KRW-BTC&count=2")
           .get()
           .addHeader("accept", "application/json")
           .build();
@@ -109,8 +133,8 @@ public class CoinService {
         List<BTCDTO> data = gson.fromJson(response.body().string(), coinListType);
         messagingTemplate.convertAndSend("/topic/Chart/BTC", data.get(0));
 
-        System.out.println(data.get(1));
         BTC entity = EntityMapper.dtoToEntity(data.get(1));
+
         try{
             btcRepository.save(entity);
         } catch (Exception e) {
@@ -131,7 +155,6 @@ public class CoinService {
         List<ETHDTO> data = gson.fromJson(response.body().string(), coinListType);
         messagingTemplate.convertAndSend("/topic/Chart/ETH", data.get(0));
 
-        System.out.println(data.get(1));
         ETH entity = EntityMapper.dtoToEntity(data.get(1));
         try{
             ethRepository.save(entity);
@@ -141,26 +164,24 @@ public class CoinService {
     }
 
     public List<CoinDTO> selectCoinCandle(){
-        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "candle_date_time_kst"));
+        Pageable pageable = PageRequest.of(0, 500, Sort.by(Sort.Direction.DESC, "candle_date_time_kst"));
         List<MINITE> result = candleRepository.selectCandle(pageable);
         result.sort(Comparator.comparing(MINITE::getCandle_date_time_kst));
         return result.stream().map(EntityMapper::entityToDto).collect(Collectors.toList());
     }
 
     public List<BTCDTO> selectBTCCandle(){
-        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "candleDateTimeKst"));
+        Pageable pageable = PageRequest.of(0, 500, Sort.by(Sort.Direction.DESC, "candleDateTimeKst"));
         List<BTC> result = btcRepository.selectCandle(pageable);
         result.sort(Comparator.comparing(BTC::getCandleDateTimeKst));
         return result.stream().map(EntityMapper::entityToDto).collect(Collectors.toList());
     }
 
     public List<ETHDTO> selectETHCandle(){
-        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "candleDateTimeKst"));
+        Pageable pageable = PageRequest.of(0, 500, Sort.by(Sort.Direction.DESC, "candleDateTimeKst"));
         List<ETH> result = ethRepository.selectCandle(pageable);
         result.sort(Comparator.comparing(ETH::getCandleDateTimeKst));
         return result.stream().map(EntityMapper::entityToDto).collect(Collectors.toList());
     }
-
-
 
 }
